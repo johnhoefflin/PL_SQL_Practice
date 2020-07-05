@@ -1,0 +1,778 @@
+PL/SQL Examples
+
+REM  Declarations section
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  radius := 3;
+  area := pi*power(radius,2);
+  insert into AREAS values (radius, area);
+end;
+.
+/
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+  cursor rad_cursor is
+      select * from RADIUS_VALS;
+  rad_val rad_cursor%ROWTYPE;
+begin
+  open rad_cursor;
+  fetch rad_cursor into rad_val;
+    area := pi*power(rad_val.radius,2);
+    insert into AREAS values (rad_val.radius, area);
+  close rad_cursor;
+end;
+.
+/
+
+REM  Executable Commands section
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  radius := 3;
+  area := pi*power(radius,2);
+  insert into AREAS values (radius, area);
+end;
+.
+/
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+  cursor rad_cursor is
+      select * from RADIUS_VALS;
+  rad_val rad_cursor%ROWTYPE;
+begin
+  open rad_cursor;
+  fetch rad_cursor into rad_val;
+    area := pi*power(rad_val.radius,2);
+    insert into AREAS values (rad_val.radius, area);
+  close rad_cursor;
+end;
+.
+/
+
+REM  Conditional Logic
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+  cursor rad_cursor is
+      select * from RADIUS_VALS;
+  rad_val rad_cursor%ROWTYPE;
+begin
+  open rad_cursor;
+  fetch rad_cursor into rad_val;
+    area := pi*power(rad_val.radius,2);
+    if  area > 30
+    then
+      insert into AREAS values (rad_val.radius, area);
+    end if;
+  close rad_cursor;
+end;
+.
+/
+
+REM  Simple Loops
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  radius := 3;
+  loop
+    area := pi*power(radius,2);
+      insert into AREAS values (radius, area);
+    radius := radius+1;
+    exit when area >100;
+  end loop;
+end;
+.
+/
+
+REM  Simple Cursor Loops
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+  cursor rad_cursor is
+      select * from RADIUS_VALS;
+  rad_val rad_cursor%ROWTYPE;
+begin
+  open rad_cursor;
+  loop
+    fetch rad_cursor into rad_val;
+    exit when rad_cursor%NOTFOUND;
+      area := pi*power(rad_val.radius,2);
+      insert into AREAS values (rad_val.radius, area);
+  end loop;
+  close rad_cursor;
+end;
+.
+/
+
+REM  FOR loops
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  for radius in 1..7 loop
+    area := pi*power(radius,2);
+      insert into AREAS values (radius, area);
+  end loop;
+end;
+.
+/
+
+REM  Cursor FOR Loops
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+  cursor rad_cursor is
+      select * from RADIUS_VALS;
+  rad_val rad_cursor%ROWTYPE;
+begin
+  for rad_val in rad_cursor
+    loop
+      area := pi*power(rad_val.radius,2);
+      insert into AREAS values (rad_val.radius, area);
+    end loop;
+end;
+.
+/
+
+REM  WHILE Loops
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  radius := 3;
+  while radius <= 7 
+    loop
+      area := pi*power(radius,2);
+      insert into AREAS values (radius, area);
+    radius := radius+1;
+  end loop;
+end;
+.
+/
+
+REM  Exception Handling
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+  some_variable   NUMBER(14,2);
+begin
+  radius := 3;
+  loop
+    some_variable := 1/(radius-4);
+    area := pi*power(radius,2);
+      insert into AREAS values (radius, area);
+    radius := radius+1;
+    exit when area >100;
+  end loop;
+exception
+  when ZERO_DIVIDE
+   then insert into AREAS values (0,0);
+end;
+.
+/
+
+REM  Procedures, Functions, and Packages
+
+declare
+  pi     constant NUMBER(9,7) := 3.1415926;
+  radius INTEGER(5);
+  area   NUMBER(14,2);
+begin
+  radius := 3;
+  area := pi*power(radius,2);
+  insert into AREAS values (radius, area);
+end;
+.
+/
+
+create function F_CALCULATE_CIRCLE_AREA (Radius IN number)
+  RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+begin
+  area := pi*power(radius,2);
+  RETURN(area);
+end;
+/
+
+select F_CALCULATE_CIRCLE_AREA(3) from DUAL;
+
+
+select F_CALCULATE_CIRCLE_AREA(12) from DUAL;
+
+
+REM  Executing Procedures
+
+grant execute on MY_PROCEDURE to George;
+
+execute P_CALCULATE_CIRCLE_AREA(5);
+
+create synonym P_CALCULATE_CIRCLE_AREA 
+   for Dora.P_CALCULATE_CIRCLE_AREA;
+
+execute P_CALCULATE_CIRCLE_AREA@REMOTE_CONNECT(5);
+
+create synonym P_CALCULATE_CIRCLE_AREA 
+   for P_CALCULATE_CIRCLE_AREA@REMOTE_CONNECT;
+
+
+REM  Procedures vs. Packages
+
+execute RADIUS_PACKAGE.P_CALCULATE_CIRCLE_AREA(3);
+
+
+REM  Create procedure syntax
+
+create procedure P_CALCULATE_CIRCLE_AREA (Radius in NUMBER)
+AS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+begin
+  area := pi*power(radius,2);
+  insert into AREAS values (radius, area);
+end;
+/
+
+execute P_CALCULATE_CIRCLE_AREA(5);
+
+select * 
+  from AREAS;
+
+create library MY_LIB as '/ora/progs.so';
+
+
+REM  Create function syntax
+
+create function F_CALCULATE_SPHERE_VOLUME (Radius IN number)
+  RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  volume   NUMBER(14,2);
+begin
+  volume := (4/3)*pi*power(radius,3);
+  RETURN(volume);
+end;
+/
+
+select F_CALCULATE_SPHERE_VOLUME(3),
+       F_CALCULATE_CIRCLE_AREA(3)
+  from DUAL;
+
+
+REM Referencing Remote Tables in Procedures
+
+create or replace procedure P_CALCULATE_CIRCLE_AREA (Radius in NUMBER)
+AS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+begin
+  area := pi*power(radius,2);
+  insert into AREAS@REMOTE_CONNECT values (radius, area);
+end;
+/
+
+create synonym AREAS for AREAS@REMOTE_CONNECT;
+
+create or replace procedure P_CALCULATE_CIRCLE_AREA (Radius in NUMBER)
+AS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+begin
+  area := pi*power(radius,2);
+  insert into AREAS values (radius, area);
+end;
+/
+
+
+REM  Debugging Procedures
+
+select Line,      /*Line number of the error./*
+       Position,  /*Column number of the error.*/
+       Text       /*Text of the error message.*/
+  from USER_ERRORS
+ where Name = 'F_CALCULATE_CIRCLE_AREA'
+ order by Sequence;
+
+
+REM  Creating your own functions
+
+select F_CALCULATE_SPHERE_VOLUME(3),
+       F_CALCULATE_CIRCLE_AREA(3)
+  from DUAL;
+
+
+REM  Customizing Error Conditions
+
+create function F_CALCULATE_CIRCLE_AREA (Radius IN number)
+  RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+begin
+  area := pi*power(radius,2);
+  RETURN(area);
+ EXCEPTION
+    when VALUE_ERROR then
+        RAISE_APPLICATION_ERROR (-20100,
+          'Error occurred during area calculation.');
+end;
+/
+
+
+REM  Create package syntax
+
+
+create or replace package RADIUS_PACKAGE
+AS
+  function F_CALCULATE_CIRCLE_AREA(Radius IN NUMBER) RETURN NUMBER;
+    PRAGMA RESTRICT_REFERENCES(F_CALCULATE_CIRCLE_AREA, WNDS);
+  function F_CALCULATE_SPHERE_VOLUME(Radius IN NUMBER) RETURN NUMBER;
+    PRAGMA RESTRICT_REFERENCES(F_CALCULATE_SPHERE_VOLUME, WNDS);
+  function F_CALCULATE_SPHERE_AREA(Radius IN NUMBER) RETURN NUMBER;
+    PRAGMA RESTRICT_REFERENCES(F_CALCULATE_SPHERE_AREA, WNDS);
+end RADIUS_PACKAGE;
+
+
+create package body RADIUS_PACKAGE 
+AS
+function F_CALCULATE_CIRCLE_AREA(Radius IN NUMBER)
+ RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+ begin
+  area := pi*power(radius,2);
+  RETURN(area);
+end F_CALCULATE_CIRCLE_AREA;
+function F_CALCULATE_SPHERE_VOLUME(Radius IN NUMBER)
+ RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  volume   NUMBER(14,2);
+ begin
+  volume := (4/3)*pi*power(radius,3);
+  RETURN(volume);
+end F_CALCULATE_SPHERE_VOLUME;
+function F_CALCULATE_SPHERE_AREA(Radius IN NUMBER)
+RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+ begin
+  area := 4*pi*power(radius,2);
+  RETURN(area);
+end F_CALCULATE_SPHERE_AREA;
+end RADIUS_PACKAGE;
+/
+
+
+REM  Initializing Packages
+
+create or replace package body RADIUS_PACKAGE 
+AS
+User_Name VARCHAR2 (32);
+Entry_Date DATE;
+function F_CALCULATE_CIRCLE_AREA(Radius IN NUMBER)
+ RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+ begin
+  area := pi*power(radius,2);
+  RETURN(area);
+end F_CALCULATE_CIRCLE_AREA;
+function F_CALCULATE_SPHERE_VOLUME(Radius IN NUMBER)
+ RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  volume   NUMBER(14,2);
+ begin
+  volume := (4/3)*pi*power(radius,3);
+  RETURN(volume);
+end F_CALCULATE_SPHERE_VOLUME;
+function F_CALCULATE_SPHERE_AREA(Radius IN NUMBER)
+RETURN NUMBER
+  IS
+  pi     constant NUMBER(9,7) := 3.1415926;
+  area   NUMBER(14,2);
+ begin
+  area := 4*pi*power(radius,2);
+  RETURN(area);
+end F_CALCULATE_SPHERE_AREA;
+BEGIN
+  select User, SysDate
+    into User_Name, Entry_Date
+    from DUAL;
+end RADIUS_PACKAGE;
+/
+
+select RADIUS_PACKAGE.F_CALCULATE_SPHERE_AREA(5)
+  from DUAL;
+
+select RADIUS_PACKAGE.F_CALCULATE_SPHERE_VOLUME(Radius)
+ from RADIUS_VALS;
+
+
+REM  Viewing Source Code for Existing Procedural Objects
+
+
+select Text
+  from USER_SOURCE
+ where Name = 'F_CALCULATE_CIRCLE_AREA'
+   and Type = 'FUNCTION'
+ order by Line;
+
+
+REM  Compiling Procedures, Functions, and Packages
+
+alter procedure P_CALCULATE_CIRCLE_AREA compile;
+
+alter function F_CALCULATE_SPHERE_VOLUME compile;
+
+alter package RADIUS_PACKAGE compile;
+
+
+REM  Dropping procedures, functions, and packages
+
+drop procedure P_CALCULATE_CIRCLE_AREA;
+drop function F_CALCULATE_SPHERE_VOLUME;
+drop package RADIUS_PACKAGE;
+drop package body RADIUS_PACKAGE;
+
+
+REM  Using Dynamic SQL
+
+create or replace procedure ANYSTRING(String IN VARCHAR2) AS
+    Cursor_Name INTEGER;
+    Ret INTEGER;
+BEGIN
+   Cursor_Name := DBMS_SQL.OPEN_CURSOR;  
+   DBMS_SQL.PARSE(Cursor_Name, String, dbms_sql.Native);
+   Ret := DBMS_SQL.EXECUTE(Cursor_Name);
+   DBMS_SQL.CLOSE_CURSOR(Cursor_Name);
+END;
+/
+
+
+execute ANYSTRING('create table CD (Artist VARCHAR2(25), Title VARCHAR2(25)) ');
+
+execute ANYSTRING('insert into CD values(''NEIL FINN'',''TRY WHISTLING THIS'') ');
+
+
+create table CD
+(Artist VARCHAR2(25),
+ Title  VARCHAR2(25));
+
+
+select * from CD;
+
+
+IMPLICIT CURSOR LOOP 
+WITH CURSOR RECORD
+
+
+SQL> desc product_groups
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------
+ PRODUCT_GROUP                                      VARCHAR2(40)
+
+
+declare
+  cursor pg_curs is 
+     select product_group 
+       from product_groups;
+begin
+  for pg_rec in pg_curs loop
+    dbms_output.put_line(pg_rec.product_group);
+  end loop;
+end;
+/
+
+Spiriva
+Combivent
+Atrovent
+Micardis
+Aggrenox
+Catapres
+Flomax
+Mirapex
+Aptivus
+Viramune
+
+PL/SQL procedure successfully completed.
+
+
+
+
+
+
+
+Examples of EXECUTE IMMEDIATE usage
+
+1. To run a DDL statement in PL/SQL.
+
+begin
+ execute immediate 'set role all';
+end;
+
+2. To pass values to a dynamic statement (USING clause).
+
+declare
+ l_depnam varchar2(20) := 'testing';
+ l_loc    varchar2(10) := 'Dubai';
+begin
+ execute immediate 'insert into dept values (:1, :2, :3)'
+   using 50, l_depnam, l_loc;
+ commit;
+end;
+
+
+3. To retrieve values from a dynamic statement (INTO clause).
+
+declare
+ l_cnt    varchar2(20);
+begin
+ execute immediate 'select count(1) from emp'
+   into l_cnt;
+ dbms_output.put_line(l_cnt);
+end;
+
+4. To call a routine dynamically: 
+The bind variables used for parameters of the routine have to be specified 
+along with the parameter type. IN type is the default, others have to be specified explicitly.
+
+declare
+ l_routin   varchar2(100) := 'gen2161.get_rowcnt';
+ l_tblnam   varchar2(20) := 'emp';
+ l_cnt      number;
+ l_status   varchar2(200);
+begin
+ execute immediate 'begin ' || l_routin || '(:2, :3, :4); end;'
+   using in l_tblnam, out l_cnt, in out l_status;
+
+ if l_status != 'OK' then
+    dbms_output.put_line('error');
+ end if;
+end;
+
+5. To return value into a PL/SQL record type: The same option can be used for %rowtype 
+variables also.
+
+declare
+ type empdtlrec is record (empno  number(4),
+                           ename  varchar2(20),
+                           deptno  number(2));
+ empdtl empdtlrec;
+begin
+ execute immediate 'select empno, ename, deptno ' ||
+                   'from emp where empno = 7934'
+   into empdtl;
+end;
+
+
+6. To pass and retrieve values: The INTO clause should precede the USING clause.
+
+declare
+ l_dept    pls_integer := 20;
+ l_nam     varchar2(20);
+ l_loc     varchar2(20);
+begin
+ execute immediate 'select dname, loc from dept where deptno = :1'
+   into l_nam, l_loc
+   using l_dept ;
+end;
+
+
+7. Multi-row query option. Use the insert statement to populate a temp table for this option. 
+Use the temporary table to carry out further processing. Alternatively, you may use REF cursors 
+to by-pass this drawback.
+
+declare
+ l_sal   pls_integer := 2000;
+begin
+ execute immediate 'insert into temp(empno, ename) ' ||
+                   '          select empno, ename from emp ' ||
+                   '          where  sal > :1'
+   using l_sal;
+ commit;
+end;
+
+
+EXECUTE IMMEDIATE is a much easier and more efficient method of processing dynamic statements 
+than could have been possible before. As the intention is to execute dynamic statements, 
+proper handling of exceptions becomes all the more important. Care should be taken to trap 
+all possible exceptions.
+
+
+
+
+
+
+
+Bulk Collect with PL/SQL
+		
+In PL/SQL, using bulk collect, it is possible to select the values from mutliple rows in one go.
+
+Example #1
+A table with two columns is created...
+
+create table bc (
+  a number, 
+  b varchar2(10)
+);
+
+... and filled with some values:
+
+insert into bc values (11,'elf');
+insert into bc values (12,'zwoelf');
+insert into bc values (13,'dreizehn');
+insert into bc values (14,'vierzehn');
+
+commit;
+
+An anonymous block is executed. Its declaration part defines two nested-table types and declares two variables, one of either type.
+In the body, the select statement used bulk collect to select all rows in the table in one go into the variables.
+Finally, a loop over the variables' elements prints the values.
+
+set serveroutput on size 10000
+
+declare
+  type t_bc_a is table of bc.a%type;
+  type t_bc_b is table of bc.b%type;
+
+  l_bc_a t_bc_a;
+  l_bc_b t_bc_b;
+begin
+  select a, b bulk collect into l_bc_a, l_bc_b from bc;
+
+  for i in l_bc_a.first .. l_bc_a.last loop
+    dbms_output.put_line(l_bc_a(i) || ', ' || l_bc_b(i));
+  end loop;
+
+end;
+/
+
+11, elf
+12, zwoelf
+13, dreizehn
+14, vierzehn
+
+
+
+
+
+
+
+
+
+
+
+
+
+BULK COLLECT and FORALL
+
+    CREATE OR REPLACE PROCEDURE fast_proc (p_array_size IN PLS_INTEGER DEFAULT 100)
+    IS
+
+    TYPE ARRAY IS TABLE OF all_objects%ROWTYPE;
+    l_data ARRAY;
+
+    CURSOR c IS
+    SELECT *
+    FROM all_objects;
+
+    BEGIN
+        OPEN c;
+        LOOP
+        FETCH c BULK COLLECT INTO l_data LIMIT p_array_size;
+
+        FORALL i IN 1..l_data.COUNT
+        INSERT INTO t2 VALUES l_data(i);
+
+        EXIT WHEN c%NOTFOUND;
+        END LOOP;
+        CLOSE c;
+    END fast_proc;
+    /
+
+which was subsequently refined to;
+
+    SQL> create or replace procedure fast_proc is
+    2         type TObjectTable is table of ALL_OBJECTS%ROWTYPE;
+    3         ObjectTable$ TObjectTable;
+    4         begin
+    5         select
+    6                     * BULK COLLECT INTO ObjectTable$
+    7         from ALL_OBJECTS;
+    8
+    9         forall x in ObjectTable$.First..ObjectTable$.Last
+    10       insert into t1 values ObjectTable$(x) ;
+    11       end;
+    12 /
+
+The key things here are the collection that is set up to hold the table data, the 
+BULK COLLECT clause and the FORALL statement.
+
+Steven Feuernstein explains the basics behind BULK_COLLECT and FORALL in a recent OTN article,
+and together these two features are known as 'Bulk Binding'. Bulk Binds are a PL/SQL technique 
+where, instead of multiple individual SELECT, INSERT, UPDATE or DELETE statements are executed 
+to retrieve from, or store data in, at table, all of the operations are carried out at once, in 
+bulk. This avoids the context-switching you get when the PL/SQL engine has to pass over to the 
+SQL engine, then back to the PL/SQL engine, and so on, when you individually access rows one at 
+a time. To do bulk binds with INSERT, UPDATE, and DELETE statements, you enclose the SQL 
+statement within a PL/SQL FORALL statement. To do bulk binds with SELECT statements, you include 
+the BULK COLLECT clause in the SELECT statement instead of using INTO.
+
+According to the online documentation, BULK COLLECT is explained as;
+
+    "The keywords BULK COLLECT tell the SQL engine to bulk-bind output collections before 
+    returning them to the PL/SQL engine. You can use these keywords in the SELECT INTO, 
+    FETCH INTO, and RETURNING INTO clauses. Here is the syntax:
+
+    ... BULK COLLECT INTO collection_name[, collection_name] ..."
+
+and FORALL is defined as
+
+    "The keyword FORALL instructs the PL/SQL engine to bulk-bind input collections before 
+    sending them to the SQL engine. Although the FORALL statement contains an iteration scheme, 
+    it is not a FOR loop. Its syntax follows:
+
+    FORALL index IN lower_bound..upper_bound
+       sql_statement;
+
+    The index can be referenced only within the FORALL statement and only as a collection 
+    subscript. The SQL statement must be an INSERT, UPDATE, or DELETE statement that references 
+    collection elements. And, the bounds must specify a valid range of consecutive index numbers. 
+    The SQL engine executes the SQL statement once for each index number in the range."
+     
+
+So there you go. Collections, BULK COLLECT and FORALL are the new features in Oracle 8i, 
+9i and 10g PL/SQL that can really make a different to you PL/SQL performance. Hopefully, if 
+you've not come across these areas before, this has been of some use - certainly through 
+writing this up I've found out quite a few things I'd only heard of in passing before. 
+Lastly, if you want to read a good article on bulk binding and FORALL, take a look at 
+"Oracle 10g Adds More to FORALL" by Steven Feuerstein.
